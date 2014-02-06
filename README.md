@@ -4,3 +4,4 @@ An article for [code4lib journal](http://journal.code4lib.org/) about virtualiza
 
 This is licensed under a [CC-BY](http://creativecommons.org/licenses/by/2.5/ca/) license, so please feel free to adopt/steal/share/post on a tree/skywrite in whatever way most delights you.
 
+![cc-by-sa](http://i.creativecommons.org/l/by-sa/3.0/88x31.png)
