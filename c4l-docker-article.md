@@ -23,7 +23,9 @@ virsh # list
 ```
 (above: a listing of virtual machines on a single server at the author's workplace)
 
-Modern virtualization schemes break down into largely one of two areas: *machine level virtualization* and *operating system level virtualization*. The systems already mentioned -- KVM, VMware, Xen, along with products like DOSBox[^dosbox], a multiplatform emulator specifically written to run DOS games -- are machine level emulators; that is, they attempt as much as possible to emulate everything about a computing environment in software, down to disk drives, RAM allocation, graphics, hard drive space, even processor type; it is entirely possible with some virtualization platforms, for instance, to emulate an ARM-based system like a Raspberry Pi[^raspiemulation] on an Intel-based platform like a desktop PC. However, when running multiple virtual machines on a single computer, you can quickly run into the limits of your machine by carving out, say, 1GB or 2GB of dedicated RAM for each instance of a VM or allocating large disk drives. Some of these problems can be worked around (mounting external drives as network shares, say) but some are more difficult (RAM, certainly).
+Modern virtualization schemes break down into largely one of two areas: *machine level virtualization* and *operating system level virtualization*. The systems already mentioned -- KVM, VMware, Xen, along with products like DOSBox[^dosbox], a multiplatform emulator specifically written to run DOS games -- are machine level emulators; that is, they attempt as much as possible to emulate everything about a computing environment in software, down to disk drives, RAM allocation, graphics, hard drive space, even processor type; it is entirely possible with some virtualization platforms, for instance, to emulate an ARM-based system like a Raspberry Pi[^raspiemulation] on an Intel-based platform like a desktop PC. However, when running multiple virtual machines on a single computer, you can quickly run into the limits of your machine by carving out, say, 1GB or 2GB of dedicated RAM for each instance of a VM or allocating large disk drives. Some of these problems can be worked around (mounting external drives as network shares, say) but some are more difficult (RAM, certainly). 
+
+Operating system level virtualization[^wikioslevel] is somewhat different; rather than try to emulate as much of an actual machine as possible, operating system level virtualization tries to share resources amongst instances; typical operating system level virtualization schemes will share RAM, disk space, and kernel with guest instances. Consequently, an arbitrary number of operating system level virtualization instances will be less likely to run out of host system resources than an equivalent number of machine level virtualization instances. 
 
 
 
@@ -44,3 +46,5 @@ Modern virtualization schemes break down into largely one of two areas: *machine
 [^dosbox]: http://www.dosbox.com
 
 [^raspiemulation]: http://cronicasredux.blogspot.ca/2011/09/installing-and-running-debian-armel-on.html
+
+[^wikioslevel]: http://en.wikipedia.org/wiki/Operating_system-level_virtualization
