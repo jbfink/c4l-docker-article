@@ -25,9 +25,9 @@ virsh # list
 
 Modern virtualization schemes break down into largely one of two areas: *machine level virtualization* and *operating system level virtualization*. The systems already mentioned -- KVM, VMware, Xen, along with products like DOSBox[^dosbox], a multiplatform emulator specifically written to run DOS games -- are machine level emulators; that is, they attempt as much as possible to emulate everything about a computing environment in software, down to disk drives, RAM allocation, graphics, hard drive space, even processor type; it is entirely possible with some virtualization platforms, for instance, to emulate an ARM-based system like a Raspberry Pi[^raspiemulation] on an Intel-based platform like a desktop PC. However, when running multiple virtual machines on a single computer, you can quickly run into the limits of your machine by carving out, say, 1GB or 2GB of dedicated RAM for each instance of a VM or allocating large disk drives. Some of these problems can be worked around (mounting external drives as network shares, say) but some are more difficult (RAM, certainly). 
 
-Operating system level virtualization[^wikioslevel] is somewhat different; rather than try to emulate as much of an actual machine as possible, operating system level virtualization tries to share resources amongst instances; typical operating system level virtualization schemes will share RAM, disk space, and kernel with guest instances. Consequently, an arbitrary number of operating system level virtualization instances will be less likely to run out of host system resources than an equivalent number of machine level virtualization instances. 
+Operating system level virtualization[^wikioslevel] is somewhat different; rather than try to emulate as much of an actual machine as possible, operating system level virtualization tries to share resources amongst instances; typical operating system level virtualization schemes will share RAM, disk space, and kernel with guest instances. Consequently, an arbitrary number of operating system level virtualization instances will be less likely to run out of host system resources than an equivalent number of machine level virtualization instances, but that flexibility comes at a cost. Because guest instances must share a kernel and therefore both a processor and operating system type[^type], you could not run, say, that virtual Raspberry Pi on x86 or Windows under a Linux host. Despite these limitations, operating system level virtualization is emerging as a very attractive workflow option for development work due to its ease of deployment and lightweight nature.
 
-
+Docker[^dockerhome] is emerging as a very attractive implementation of  operating system level virtualization. Open source, its focus on DevOps[^devops] methodology, its ease of replication, version control-ish metaphors and re-use of machine images has it rapidly gaining mindshare amongst developers. But like most good open source projects, Docker incorporates a lot of existing Linux technologies along with new functionality; it uses already existing technologies like copy-on-write union filesystems (usually AUFS[^aufs]) and Linux Containers[^lxc], and 
 
 
 [^wikivirtualization]: http://en.wikipedia.org/wiki/Virtualization
@@ -49,3 +49,13 @@ Operating system level virtualization[^wikioslevel] is somewhat different; rathe
 [^raspiemulation]: http://cronicasredux.blogspot.ca/2011/09/installing-and-running-debian-armel-on.html
 
 [^wikioslevel]: http://en.wikipedia.org/wiki/Operating_system-level_virtualization
+
+[^type]: You can run different Linux *versions* even though you might commonly consider them different OSs; a Red Hat guest could run under an Ubuntu host, for instance.
+
+[^dockerhome]: http://docker.io
+
+[^devops]: http://radar.oreilly.com/2012/06/what-is-devops.html
+
+[^aufs]:  http://www.thegeekstuff.com/2013/05/linux-aufs/
+
+[^lxc]: http://linuxcontainers.org/
