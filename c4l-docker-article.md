@@ -4,7 +4,7 @@ Docker Article Title, by John Fink
 
 ----
 
-If you were working in library IT in the last millenium, you'll likely remember what your server room looked like -- PC towers running Novell Netware attached to huge multi-disc CDROM arrays, refrigerator-sized Sun boxes, Digital AlphaServers running your library catalogue. To run most of the serious business of libraries, you needed serious equipment to go with them. Machine rooms were jumbled messes of shelves, wires and air conditioning units. With the advent of Linux running on microcomputers, these rooms got slightly smaller and maybe slightly less complex, but it wasn't until the early 2000s that the real sea change came for the server room -- the rapid adoption of easily implementable virtualization[^wikivirtualization], or the running of multiple discrete operating systems in a single machine.
+If you were working in library IT in the last millennium, you'll likely remember what your server room looked like -- PC towers running Novell Netware attached to huge multi-disc CDROM arrays, refrigerator-sized Sun boxes, Digital AlphaServers running your library catalogue. To run most of the serious business of libraries, you needed serious equipment to go with them. Machine rooms were jumbled messes of shelves, wires and air conditioning units. With the advent of Linux running on microcomputers, these rooms got slightly smaller and maybe slightly less complex, but it wasn't until the early 2000s that the real sea change came for the server room -- the rapid adoption of easily implementable virtualization[^wikivirtualization], or the running of multiple discrete operating systems in a single machine.
 
 Although virtualization in the modern sense actually happened as early as the 1960s with VMs for IBM System/360 machines[^registerhistory2] and both the 286 and 386 chips contained some species of virtualization[^registerhistory1] it wasn't until 2001 when VMWare introduced its x86 virtualization products that virtualization in the Linux space really took off. With technologies like KVM[^kvm] and Xen[^xen] looming large in the local space and products like Amazon Web Services[^aws] and the OpenStack[^openstack] framework claiming the cloud the old server room being a jumble of white box PCs and CDROM towers is more or less extinct; today, multiple virtual machines can be created out of minimal physical machines.
 
@@ -29,9 +29,31 @@ Operating system level virtualization[^wikioslevel] is somewhat different; rathe
 
 Docker[^dockerhome] is emerging as a very attractive implementation of  operating system level virtualization. Open source, its focus on DevOps[^devops] methodology, its ease of replication, version control-ish metaphors and re-use of machine images has it rapidly gaining mindshare amongst developers. But like most good open source projects, Docker incorporates a lot of existing Linux technologies along with new functionality;t it uses already existing technologies like copy-on-write union filesystems (usually AUFS[^aufs]) and Linux Containers[^lxc], and couples that with a number of features that make it developer centric (and therefore distinct from traditional virtual machines that attempt to hew as much as possible to the metaphor of *machine*): like deployment portability, versioning, re-use, and  repeatability[^shykesso].
 
-These are features worth thinking about as they transform the notion of virtual machine provisioning from a time consuming, sysadmin-centric model to one focused more on a developer-oriented workflow; in particular, the git[^gitscm]-like nature of Docker's versioning system (with its diffs and tags) and the promise of write once, run anywhere made manifest at last. [FIX]
+These are features worth thinking about as they transform the notion of virtual machine provisioning from a time consuming, sysadmin-centric model to one focused more on a developer-oriented workflow; in particular, the git[^gitscm]-like nature of Docker's versioning system (with its diffs and tags).
 
 Wordpress is the white lab rat of library software -- used everywhere, well supported, well understood, generally easy to take care of, and with a huge host of ancillary software behind it. In August of 2013 I started work on docker-wordpress[^dwgithub], a Docker image that contains Wordpress, Apache, MySQL and supervisord[^supervisord], and is a fairly good, self-contained example of a moderately complex Docker application.
+
+The key problem with setting up Wordpress in a normal fashion, freezing it in a Docker image, and then running that wherever is that the configuration would remain the same across containers -- same MySQL passwords, same Wordpress salts and keys in PHP. Ideally every time docker-wordpress is run there should be different values for all the fiddly Wordpress configuration options, so docker-wordpress contains start.sh[^startsh], which runs a series of commands at first inception to set values for things like salts in wp-config.php:
+
+```
+sed -e "s/database_name_here/$WORDPRESS_DB/
+s/username_here/$WORDPRESS_DB/
+s/password_here/$WORDPRESS_PASSWORD/
+/'AUTH_KEY'/s/put your unique phrase here/`pwgen -c -n -1 65`/
+/'SECURE_AUTH_KEY'/s/put your unique phrase here/`pwgen -c -n -1 65`/
+/'LOGGED_IN_KEY'/s/put your unique phrase here/`pwgen -c -n -1 65`/
+/'NONCE_KEY'/s/put your unique phrase here/`pwgen -c -n -1 65`/
+/'AUTH_SALT'/s/put your unique phrase here/`pwgen -c -n -1 65`/
+/'SECURE_AUTH_SALT'/s/put your unique phrase here/`pwgen -c -n -1 65`/
+/'LOGGED_IN_SALT'/s/put your unique phrase here/`pwgen -c -n -1 65`/
+/'NONCE_SALT'/s/put your unique phrase here/`pwgen -c -n -1 65`/" /var/www/wp-config-sample.php > /var/www/wp-config.php
+```
+
+This ensures that different values for important variables get slotted in each time docker-wordpress is first run; combining this with the output from the initial build[^gistbuild] from source means a fairly long startup time, but subsequent runs usually take less than 30 seconds, and rebuilds (which can be cached) really only need to happen when major updates to component software happen. Running the docker-wordpress image is a fairly simple affair, and new containers take about a second to spawn, after which they can be accessed via internal IPs or given outward-facing ports on the host machine.
+
+Porting more esoteric applications to Docker is not yet an easy procedure. Docker wants to run things in foreground processes, making it necessary to convert common programs like MySQL and Apache from their usual background modes to foreground ones, and Docker's focus on one application per container (achieved in docker-wordpress and many other Docker applications through judicious use of supervisord) makes, say, running an ILS like Evergreen somewhat problematic. However, with 
+
+
 
 
 [^wikivirtualization]: http://en.wikipedia.org/wiki/Virtualization
@@ -71,3 +93,7 @@ Wordpress is the white lab rat of library software -- used everywhere, well supp
 [^dwgithub]: http://github.com/jbfink/docker-wordpress
 
 [^supervisord]: http://supervisord.org/
+
+[^startsh]: https://github.com/jbfink/docker-wordpress/blob/master/start.sh
+
+[^gistbuild]: https://gist.github.com/jbfink/9054707
