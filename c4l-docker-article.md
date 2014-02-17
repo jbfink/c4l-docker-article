@@ -1,6 +1,6 @@
 
 
-Docker Article Title, by John Fink
+ Docker: a Software as a Service operating system level virtualization framework, by John Fink
 
 ----
 
@@ -51,7 +51,7 @@ s/password_here/$WORDPRESS_PASSWORD/
 
 This ensures that different values for important variables get slotted in each time docker-wordpress is first run; combining this with the output from the initial build[^gistbuild] from source means a fairly long startup time, but subsequent runs usually take less than 30 seconds, and rebuilds (which can be cached) really only need to happen when major updates to component software happen. Running the docker-wordpress image is a fairly simple affair, and new containers take about a second to spawn, after which they can be accessed via internal IPs or given outward-facing ports on the host machine.
 
-Porting more esoteric applications to Docker is not yet an easy procedure. Docker wants to run things in foreground processes, making it necessary to convert common programs like MySQL and Apache from their usual background modes to foreground ones, and Docker's focus on one application per container (achieved in docker-wordpress and many other Docker applications through judicious use of supervisord) makes, say, running an ILS like Evergreen somewhat problematic. However, with 
+Porting more esoteric applications to Docker is not yet an easy procedure. Docker wants to run things in foreground processes, making it necessary to convert common programs like MySQL and Apache from their usual background modes to foreground ones, and Docker's focus on one application per container (achieved in docker-wordpress and many other Docker applications through judicious use of supervisord) makes, say, running an ILS like Evergreen somewhat problematic. However, with Docker rapidly approaching a stable state[^docker10] and more focus on making applications work with Docker-style operating system level virtualization as well as more traditional VMs and physical servers as a probable result, who wouldn't be happy to see a huge installation procedure[^evergreenbuh] boiled down to a single command?
 
 
 
@@ -97,3 +97,7 @@ Porting more esoteric applications to Docker is not yet an easy procedure. Docke
 [^startsh]: https://github.com/jbfink/docker-wordpress/blob/master/start.sh
 
 [^gistbuild]: https://gist.github.com/jbfink/9054707
+
+[^docker10]: http://blog.docker.io/2013/08/getting-to-docker-1-0/
+
+[^evergreenbuh]: http://docs.evergreen-ils.org/2.5/_installing_the_evergreen_server.html
