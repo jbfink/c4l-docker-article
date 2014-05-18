@@ -25,11 +25,17 @@ virsh # list
 
 Modern virtualization schemes break down into largely one of two areas: *machine level virtualization* and *operating system level virtualization*. The systems already mentioned -- KVM, VMware, Xen, along with products like DOSBox[^dosbox], a multiplatform emulator specifically written to run DOS games -- are machine level emulators; that is, they attempt as much as possible to emulate everything about a computing environment in software, down to disk drives, RAM allocation, graphics, hard drive space, even processor type; it is entirely possible with some virtualization platforms, for instance, to emulate an ARM-based system like a Raspberry Pi[^raspiemulation] on an Intel-based platform like a desktop PC. However, when running multiple virtual machines on a single computer, you can quickly run into the limits of your machine by carving out, say, 1GB or 2GB of dedicated RAM for each instance of a VM or allocating large disk drives. Some of these problems can be worked around (mounting external drives as network shares, say) but some are more difficult (RAM, certainly). 
 
+So, at a small-to-midrange IT shop that doesn't do a whole lot of software development -- as what you'd find traditionally in most libraries -- there might be a call for a handful of machine level virtualization instances. Maybe one for the library's web presence, another for the ILS, another to control images for patron workstations. These would be as much as possible drop-in replacements for those old white boxes; some instances, like for a given ILS, would be bound by convention or licensing to have as little deviation from a traditional install as possible; in others, the effort to customize an install to a virtualization framework might not be worth the payoff; gains in performance or convenience may very well be minimal.
+
 Operating system level virtualization[^wikioslevel] is somewhat different; rather than try to emulate as much of an actual machine as possible, operating system level virtualization tries to share resources amongst instances; typical operating system level virtualization schemes will share RAM, disk space, and kernel with guest instances. Consequently, an arbitrary number of operating system level virtualization instances will be less likely to run out of host system resources than an equivalent number of machine level virtualization instances, but that flexibility comes at a cost. Because guest instances must share a kernel and therefore both a processor and operating system type[^type], you could not run, say, that virtual Raspberry Pi on x86 or Windows under a Linux host. Despite these limitations, operating system level virtualization is emerging as a very attractive workflow option for development work due to its ease of deployment and lightweight nature.
+
+The modern development environment is one of constant iteration. Write code. Write tests. Code breaks. Write more code. Write more tests. Break more things. The less time that developers spend sitting around waiting for code to compile or interpret and tests to break means that they can spend more time doing the specific work that they're good at; imagine having to set up a new machine, even a virtual one, each time you wanted to test your code from scratch. The popular Virtualbox[^virtualbox] machine level virtualization framework, for instance, is very heavily GUI-oriented[^vboxscreenshot] and has therefore had an entire framework[^vagrant] built around it designed to make the creating and destroying of Virtualbox VMs scriptable. 
 
 Docker[^dockerhome] is emerging as a very attractive implementation of  operating system level virtualization. Open source, its focus on DevOps[^devops] methodology, its ease of replication, version control-ish metaphors and re-use of machine images has it rapidly gaining mindshare amongst developers. But like most good open source projects, Docker incorporates a lot of existing Linux technologies along with new functionality;t it uses already existing technologies like copy-on-write union filesystems (usually AUFS[^aufs]) and Linux Containers[^lxc], and couples that with a number of features that make it developer centric (and therefore distinct from traditional virtual machines that attempt to hew as much as possible to the metaphor of *machine*): like deployment portability, versioning, re-use, and  repeatability[^shykesso].
 
 These are features worth thinking about as they transform the notion of virtual machine provisioning from a time consuming, sysadmin-centric model to one focused more on a developer-oriented workflow; in particular, the git[^gitscm]-like nature of Docker's versioning system (with its diffs and tags).
+
+But the essential difference between machine level virtualization and Docker's operating system level virtualization is this: machine level VMs are about faithful *recreation* of hardware -- right down to RAM allotment, how many CPUs to assign, emulating NICs, and so forth -- and operating system level virtualization is about *applications*, not machines[^shykesso2]. And most of the time when we're developing, testing, and releasing software we care about applications and not really the specific hardware environment -- real or virtual -- that we're developing in, with the exception of, say, emulation of historical hardware[^simh] or other edge cases. 
 
 Wordpress is the white lab rat of library software -- used everywhere, well supported, well understood, generally easy to take care of, and with a huge host of ancillary software behind it. In August of 2013 I started work on docker-wordpress[^dwgithub], a Docker image that contains Wordpress, Apache, MySQL and supervisord[^supervisord], and is a fairly good, self-contained example of a moderately complex Docker application.
 
@@ -78,6 +84,12 @@ Porting more esoteric applications to Docker is not yet an easy procedure. Docke
 
 [^type]: You can run different Linux *versions* even though you might commonly consider them different OSs; a Red Hat guest could run under an Ubuntu host, for instance.
 
+[^virtualbox]: http://virtualbox.org
+
+[^vboxscreenshot]: https://www.virtualbox.org/attachment/wiki/Screenshots/gnome.png
+
+[^vagrant]: http://vagrantup.com
+
 [^dockerhome]: http://docker.io
 
 [^devops]: http://radar.oreilly.com/2012/06/what-is-devops.html
@@ -89,6 +101,10 @@ Porting more esoteric applications to Docker is not yet an easy procedure. Docke
 [^shykesso]: http://stackoverflow.com/a/18208445/380282
 
 [^gitscm]: http://git-scm.com/
+
+[^shykesso2]: https://stackoverflow.com/a/22370529
+
+[^simh]: http://simh.trailing-edge.com/
 
 [^dwgithub]: http://github.com/jbfink/docker-wordpress
 
