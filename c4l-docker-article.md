@@ -84,7 +84,7 @@ CMD ["/bin/bash", "/start.sh"]
 
 This Dockerfile builds a complete Wordpress environment, including a MySQL database, and finishes the image up in about 15 seconds if it can use some cached layers; from scratch there's a lot of time from running the apt-get steps. A slow initial build is an acceptable price to pay for the ability to run subsequent builds in under a minute, making rapid iterations possible.
 
-Why Wordpress? Wordpress is the white lab rat of library software -- used everywhere, well supported, well understood, generally easy to take care of, and with a huge host of ancillary software behind it. In the spring of 2013 I started building a Docker wordpress container manually with an eye towards using it in-house for developmental projects; by launching a single Docker container running a bash shell and doing the normal apt-gets and vim editing of config files; basically a manual version of the above Dockerfile. I put it up on docker index[^dockerindex] and was contacted by a few folks in email about how I built it. In August of 2013 I started work on docker-wordpress[^dwgithub], a structured way of building what I had done manually that people could play with and build on.
+Why Wordpress? Wordpress is the white lab rat of library software -- used everywhere, well supported, well understood, generally easy to take care of, and with a huge host of ancillary software behind it. In the spring of 2013 I started building a Docker wordpress container manually with an eye towards using it in-house for developmental projects; by launching a single Docker container running a bash shell and doing the normal apt-gets and vim editing of config files; basically a manual version of the above Dockerfile. I put it up on docker index[^dockerindex] and was contacted by a few folks in email about how I built it. In August of 2013 I started work on docker-wordpress[^dwgithub], a structured way of building what I had done manually that people could play with and build on.  
 
 The key problem with setting up Wordpress in a normal fashion, freezing it in a Docker image, and then running that wherever is that the configuration would remain the same across containers -- same MySQL passwords, same Wordpress salts and keys in PHP. Ideally every time docker-wordpress is run there should be different values for all the fiddly Wordpress configuration options, so docker-wordpress contains start.sh[^startsh], which runs a series of commands at first inception to set values for things like salts in wp-config.php:
 
@@ -103,6 +103,13 @@ s/password_here/$WORDPRESS_PASSWORD/
 ```
 
 This ensures that different values for important variables get slotted in each time docker-wordpress is first run; combining this with the output from the initial build[^gistbuild] from source means a fairly long startup time, but subsequent runs usually take less than 30 seconds, and rebuilds (which can be cached) really only need to happen when major updates to component software happen. Running the docker-wordpress image is a fairly simple affair, and new containers take about a second to spawn, after which they can be accessed via internal IPs or given outward-facing ports on the host machine.
+
+Docker-wordpress has a great advantage in that it's one image, can be run in one container, and is easy to understand; but it would be a mistake to consider it a good model for a production-type instance; in particular, its slapdash approach to logging (something Logstash[^logstash] could go a long way towards fixing) and inclusion of a local MySQL (consider running 20 docker-wordpresses, each with their own db; it would make way more sense to have a single MySQL server serving multiple Wordpresses) make it a difficult sell for a production environment as it is currently written.
+
+Docker itself is also not without its warts; as the Docker folks state upfront, docker has not reached 1.0 and is considered under heavy development and not ready for use in production anyway. An illustration of how development has changed from version to version - Docker has had a historical disadvantage in depending on a kernel feature (AUFS) that, notably, is not part of the standard Linux kernel making implementations on non-Ubuntu systems somewhat problematic. This was solved in more recent versions[^docker07] by introducing a storage layer API.
+
+
+
 
 Porting more esoteric applications to Docker is not yet an easy procedure. Docker wants to run things in foreground processes, making it necessary to convert common programs like MySQL and Apache from their usual background modes to foreground ones, and Docker's focus on one application per container (achieved in docker-wordpress and many other Docker applications through judicious use of supervisord) makes, say, running an ILS like Evergreen somewhat problematic. However, with Docker rapidly approaching a stable state[^docker10] and more focus on making applications work with Docker-style operating system level virtualization as well as more traditional VMs and physical servers as a probable result, who wouldn't be happy to see a huge installation procedure[^evergreenbuh] boiled down to a single command?
 
@@ -168,6 +175,10 @@ Porting more esoteric applications to Docker is not yet an easy procedure. Docke
 [^startsh]: https://github.com/jbfink/docker-wordpress/blob/master/start.sh
 
 [^gistbuild]: https://gist.github.com/jbfink/9054707
+
+[^logstash]: http://logstash.net/
+
+[^docker07]: http://blog.docker.io/2013/11/docker-0-7-docker-now-runs-on-any-linux-distribution/
 
 [^docker10]: http://blog.docker.io/2013/08/getting-to-docker-1-0/
 
