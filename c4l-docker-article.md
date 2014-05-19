@@ -41,7 +41,7 @@ I first became interested in Docker in early 2013; I was talking about the Go[^G
 
 But how does Docker look when you're actually running it? After the Docker software is installed[^dockerinstall], you're left with a primary binary ("docker") with which you can start, stop, import, export, and do other[^dockercli] operations. 
 
-Here's an example of a Docker host running a few containers.
+Here's an example of a Docker host running a few containers, which we can see by running docker ps on the comand line.
 ```
 CONTAINER ID        IMAGE                     COMMAND             CREATED             STATUS              PORTS                                        NAMES
 1bc191f4cdbb        bedework:latest           supervisord -n      11 days ago         Up 11 days          0.0.0.0:8080->8080/tcp                       sick_newton         
@@ -52,9 +52,39 @@ f752161937c6        ldap_update_pw:latest     supervisord -n      5 weeks ago   
 33cf9eb89073        catmandu:in-process       /bin/bash           6 weeks ago         Up 13 days                                                       cranky_mccarthy     
 ```
 
-Individual docker instances are split up into *images* and *containers*. Containers are running instances of images. You can have several containers that come from 
 
-Wordpress is the white lab rat of library software -- used everywhere, well supported, well understood, generally easy to take care of, and with a huge host of ancillary software behind it. In the spring of 2013 I started building a Docker wordpress container manually; by launching a single Docker container running a bash shell and doing the normal apt-gets and vim editing of config files. In August of 2013 I started work on docker-wordpress[^dwgithub], a Docker image that contains Wordpress, Apache, MySQL and supervisord[^supervisord], and is a fairly good, self-contained example of a moderately complex Docker application.
+Individual docker instances are split up into *images* and *containers*. Containers are running instances of images. You can have several containers that come from the same image or variants of that image; in the above list, we can see that container id b58946da298c and e5a0f8a71f7e are running versions of the image "papyrus-demo" -- images can have tags that act similarly to git tags, representing different states of a common image. In the papyrus-demo's image, there's a tag "in-process" And a tag "port6000"; an image without a distinct tag is always "latest".
+
+It's important to note that docker images are almost always made up of other images and layered on top of one another, rather like git commits are. When docker images are built using a Dockerfile[^dockerfile] each actionable step in that Dockerfile creates another layer and the sum total of those layers represents the final image. Dockerfiles themselves are simple-to-parse lists of actions, like so:
+
+```
+FROM ubuntu:latest
+MAINTAINER John Fink <john.fink@gmail.com>
+RUN apt-get update # Mon Jan 27 11:35:22 EST 2014
+RUN apt-get -y upgrade
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install mysql-client mysql-server apache2 libapache2-mod-php5 pwgen python-setuptools vim-tiny php5-mysql openssh-server sudo php5-ldap
+RUN easy_install supervisor
+ADD ./start.sh /start.sh
+ADD ./foreground.sh /etc/apache2/foreground.sh
+ADD ./supervisord.conf /etc/supervisord.conf
+RUN echo %sudo  ALL=NOPASSWD: ALL >> /etc/sudoers
+RUN rm -rf /var/www/
+ADD http://wordpress.org/latest.tar.gz /wordpress.tar.gz
+RUN tar xvzf /wordpress.tar.gz 
+RUN mv /wordpress /var/www/
+RUN chown -R www-data:www-data /var/www/
+RUN chmod 755 /start.sh
+RUN chmod 755 /etc/apache2/foreground.sh
+RUN mkdir /var/log/supervisor/
+RUN mkdir /var/run/sshd
+EXPOSE 80
+EXPOSE 22
+CMD ["/bin/bash", "/start.sh"]
+```
+
+This Dockerfile builds a complete Wordpress environment, including a MySQL database, and finishes the image up in about 15 seconds if it can use some cached layers; from scratch there's a lot of time from running the apt-get steps. A slow initial build is an acceptable price to pay for the ability to run subsequent builds in under a minute, making rapid iterations possible.
+
+Why Wordpress? Wordpress is the white lab rat of library software -- used everywhere, well supported, well understood, generally easy to take care of, and with a huge host of ancillary software behind it. In the spring of 2013 I started building a Docker wordpress container manually with an eye towards using it in-house for developmental projects; by launching a single Docker container running a bash shell and doing the normal apt-gets and vim editing of config files; basically a manual version of the above Dockerfile. I put it up on docker index[^dockerindex] and was contacted by a few folks in email about how I built it. In August of 2013 I started work on docker-wordpress[^dwgithub], a structured way of building what I had done manually that people could play with and build on.
 
 The key problem with setting up Wordpress in a normal fashion, freezing it in a Docker image, and then running that wherever is that the configuration would remain the same across containers -- same MySQL passwords, same Wordpress salts and keys in PHP. Ideally every time docker-wordpress is run there should be different values for all the fiddly Wordpress configuration options, so docker-wordpress contains start.sh[^startsh], which runs a series of commands at first inception to set values for things like salts in wp-config.php:
 
@@ -129,9 +159,11 @@ Porting more esoteric applications to Docker is not yet an easy procedure. Docke
 
 [^dockercli]: http://docs.docker.io/reference/commandline/cli/
 
-[^dwgithub]: http://github.com/jbfink/docker-wordpress
+[^dockerfile]: http://docs.docker.io/reference/builder/
 
-[^supervisord]: http://supervisord.org/
+[^dockerindex]: https://index.docker.io/u/jbfink/wordpress/
+
+[^dwgithub]: http://github.com/jbfink/docker-wordpress
 
 [^startsh]: https://github.com/jbfink/docker-wordpress/blob/master/start.sh
 
