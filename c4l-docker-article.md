@@ -37,9 +37,24 @@ These are features worth thinking about as they transform the notion of virtual 
 
 At it's core, Docker is a virtualization framework focused around running applications and not around emulating hardware, which sounds facile at first read but underscores the critical difference between the two methodologies. The essential difference between machine level virtualization and Docker's operating system level virtualization is this: machine level VMs are about faithful *recreation* of hardware -- right down to RAM allotment, how many CPUs to assign, emulating NICs, and so forth -- and operating system level virtualization is about *applications*, not machines[^shykesso2]. And most of the time when we're developing, testing, and releasing software we care about applications and not really the specific hardware environment -- real or virtual -- that we're developing in, with the exception of, say, emulation of historical hardware[^simh] or other edge cases. When we write to mailing lists asking for help with Drupal, we don't say "I have a Dell PowerEdge 5100 with 4 Intel Core2Duo processors and 16GB of 70ns RAM and two Atheros 100GB NIC cards and I can't get this Drupal module to work correctly." Unless we have a pretty strong indicator that our problem is hardware bound, we focus on software. As it happens, this is what Docker does also. There is usually no reason to try to define for Docker how much memory it should have, how large its hard drive should be, or how much CPU it should take up; you don't generally do this for the code you write on your desktop either.
 
-I first became interested in Docker in early 2013; I was talking about the Go[^Go] programming language with a colleague and asking where the killer Go applications were; he had mentioned that he had heard about a recently open source visualization framework called Docker that was written in Go and that it had been getting some traction; I filed this away under "things to investigate at some point" but it wasn't until I was wrestling with machine level virtualization on a desktop dating from 2007 that I saw the light -- this anemic box had trouble running two Virtualbox instances concurrently, but I tried to run Docker and ran over 40 docker containers on the same host without a noticeable drop in host system performance.
+I first became interested in Docker in early 2013; I was talking about the Go[^Go] programming language with a colleague and asking where the killer Go applications were; he had mentioned that he had heard about a recently open source visualization framework called Docker that was written in Go and that it had been getting some traction; I filed this away under "things to investigate at some point" but it wasn't until I was wrestling with machine level virtualization on a desktop dating from 2007 that I saw the light -- this anemic box had trouble running two Virtualbox instances concurrently, but I tried to run Docker and ran over 40 docker containers on the same host without a noticeable drop in host system performance. 
 
-Wordpress is the white lab rat of library software -- used everywhere, well supported, well understood, generally easy to take care of, and with a huge host of ancillary software behind it. In August of 2013 I started work on docker-wordpress[^dwgithub], a Docker image that contains Wordpress, Apache, MySQL and supervisord[^supervisord], and is a fairly good, self-contained example of a moderately complex Docker application.
+But how does Docker look when you're actually running it? After the Docker software is installed[^dockerinstall], you're left with a primary binary ("docker") with which you can start, stop, import, export, and do other[^dockercli] operations. 
+
+Here's an example of a Docker host running a few containers.
+```
+CONTAINER ID        IMAGE                     COMMAND             CREATED             STATUS              PORTS                                        NAMES
+1bc191f4cdbb        bedework:latest           supervisord -n      11 days ago         Up 11 days          0.0.0.0:8080->8080/tcp                       sick_newton         
+b58946da298c        papyrus-demo:port6000     /bin/bash           13 days ago         Up 13 days          3000/tcp, 6000/tcp, 0.0.0.0:6001->6001/tcp   drunk_bell          
+c90c0a6be88f        saucy-csclub:latest       /bin/bash           13 days ago         Up 13 days          0.0.0.0:9999->9999/tcp                       angry_shockley      
+e5a0f8a71f7e        papyrus-demo:in-process   /start.sh           2 weeks ago         Up 13 days          0.0.0.0:3000->3000/tcp                       mad_poincare        
+f752161937c6        ldap_update_pw:latest     supervisord -n      5 weeks ago         Up 13 days          0.0.0.0:5000->5000/tcp                       distracted_nobel    
+33cf9eb89073        catmandu:in-process       /bin/bash           6 weeks ago         Up 13 days                                                       cranky_mccarthy     
+```
+
+Individual docker instances are split up into *images* and *containers*. Containers are running instances of images. You can have several containers that come from 
+
+Wordpress is the white lab rat of library software -- used everywhere, well supported, well understood, generally easy to take care of, and with a huge host of ancillary software behind it. In the spring of 2013 I started building a Docker wordpress container manually; by launching a single Docker container running a bash shell and doing the normal apt-gets and vim editing of config files. In August of 2013 I started work on docker-wordpress[^dwgithub], a Docker image that contains Wordpress, Apache, MySQL and supervisord[^supervisord], and is a fairly good, self-contained example of a moderately complex Docker application.
 
 The key problem with setting up Wordpress in a normal fashion, freezing it in a Docker image, and then running that wherever is that the configuration would remain the same across containers -- same MySQL passwords, same Wordpress salts and keys in PHP. Ideally every time docker-wordpress is run there should be different values for all the fiddly Wordpress configuration options, so docker-wordpress contains start.sh[^startsh], which runs a series of commands at first inception to set values for things like salts in wp-config.php:
 
@@ -109,6 +124,10 @@ Porting more esoteric applications to Docker is not yet an easy procedure. Docke
 [^simh]: http://simh.trailing-edge.com/
 
 [^go]: http://golang.org
+
+[^dockerinstall]: https://www.docker.io/gettingstarted/#h_installation
+
+[^dockercli]: http://docs.docker.io/reference/commandline/cli/
 
 [^dwgithub]: http://github.com/jbfink/docker-wordpress
 
