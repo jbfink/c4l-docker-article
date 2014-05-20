@@ -4,4 +4,20 @@ An article for [code4lib journal](http://journal.code4lib.org/) about virtualiza
 
 This is licensed under a [CC-BY](http://creativecommons.org/licenses/by/2.5/ca/) license, so please feel free to adopt/steal/share/post on a tree/skywrite in whatever way most delights you.
 
+As a fun bonus (thanks @ruebot) this repo can now build a simple Docker container that will serve the article. To do that, just do:
+
+```
+docker build -rm -t <yourname>/c4l-article-docker git://github.com/jbfink/c4l-docker-article.git
+```
+
+Run as:
+
+```
+docker run -Pd <yourname>/c4l-docker-article
+```
+
+Then check docker ps for the exposed port and hit it with a web browser! There! Wasn't that much easier than just going directly to the article itself????
+
+
+
 ![cc-by-sa](http://i.creativecommons.org/l/by-sa/3.0/88x31.png)
