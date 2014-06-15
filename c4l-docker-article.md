@@ -118,6 +118,13 @@ This ensures that different values for important variables get loaded each time 
 
 Docker-wordpress has a great advantage in that it's one image, can be run in one container, and is easy to understand. But it would be a mistake to consider it a good model for a production-type instance. In particular, its slapdash approach to logging (something Logstash[^logstash] could go a long way towards fixing) and inclusion of a local MySQL instance make it a difficult sell for a production environment as it is currently written.  Consider running 20 docker-wordpresses, each with its own database; it would make much more sense to have a single MySQL server serving multiple Wordpress instances.
 
+
+Article-as-Container
+--------------------
+
+This article has its own Github[^githubarticle] repository and included in that repository is the text of the article and a very simple Docker container that converts the Markdown the article is written in to html via pandoc[^pandoc] and serves it up via the Python SimpleHTTPServer module.
+
+
 Conclusion
 ==========
 
@@ -190,6 +197,10 @@ Despite the work yet to be done on Docker, it is rapidly approaching a stable st
 [^gistbuild]: https://gist.github.com/jbfink/9054707
 
 [^logstash]: http://logstash.net/
+
+[^githubarticle]: http://github.com/jbfink/c4l-docker-article
+
+[^pandoc]: http://johnmacfarlane.net/pandoc/
 
 [^docker07]: http://blog.docker.io/2013/11/docker-0-7-docker-now-runs-on-any-linux-distribution/
 
