@@ -62,36 +62,45 @@ f752161937c6        ldap_update_pw:latest     supervisord -n      5 weeks ago   
 
 Individual docker instances are split up into *images* and *containers*. Containers run instances of images. You can have several containers that come from the same image or variants of that image. In the above list, we can see that container id b58946da298c and e5a0f8a71f7e are running versions of the image "papyrus-demo," demonstrating that images can have tags that act similarly to git tags, representing different states of a common image. In the papyrus-demo's image, there's a tag "in-process" And a tag "port6000"; an image without a distinct tag is always "latest".
 
-<!--- I like the idea you mentioned last week of including a simple step-by-step example. I'm guessing it would go somewhere in here and replace these paragraphs because it would illustrate the same concepts. -->
 
-It's important to note that docker images are almost always made up of other images and layered on top of one another, rather like git commits are. When docker images are built using a Dockerfile[^dockerfile] each actionable step in that Dockerfile creates another layer and the sum total of those layers represents the final image. Dockerfiles themselves are simple-to-parse lists of actions, like so:
+Article-as-Container
+--------------------
+
+This article has its own Github[^githubarticle] repository and included in that repository is the text of the article and a very simple Docker container that converts the Markdown the article is written in to html via pandoc[^pandoc] and serves it up via the Python SimpleHTTPServer module. As such, it is a very simple Docker container and is built with two components. The first of which, the Dockerfile, runs when the image is first built and the second, start.sh, runs at each instantiation of image into container. Here's the Dockerfile, line by line:
 
 ```
 FROM ubuntu:latest
-MAINTAINER John Fink <john.fink@gmail.com>
-RUN apt-get update # Mon Jan 27 11:35:22 EST 2014
-RUN apt-get -y upgrade
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install mysql-client mysql-server apache2 libapache2-mod-php5 pwgen python-setuptools vim-tiny php5-mysql openssh-server sudo php5-ldap
-RUN easy_install supervisor
-ADD ./start.sh /start.sh
-ADD ./foreground.sh /etc/apache2/foreground.sh
-ADD ./supervisord.conf /etc/supervisord.conf
-RUN echo %sudo  ALL=NOPASSWD: ALL >> /etc/sudoers
-RUN rm -rf /var/www/
-ADD http://wordpress.org/latest.tar.gz /wordpress.tar.gz
-RUN tar xvzf /wordpress.tar.gz 
-RUN mv /wordpress /var/www/
-RUN chown -R www-data:www-data /var/www/
-RUN chmod 755 /start.sh
-RUN chmod 755 /etc/apache2/foreground.sh
-RUN mkdir /var/log/supervisor/
-RUN mkdir /var/run/sshd
-EXPOSE 80
-EXPOSE 22
-CMD ["/bin/bash", "/start.sh"]
 ```
 
-This Dockerfile builds a complete Wordpress environment, including a MySQL database, and finishes the image up in about 15 seconds if it can use some cached layers. From scratch there's a lot of time from running the apt-get steps, but a slow initial build is an acceptable price to pay for the ability to run subsequent builds in under a minute, making rapid iterations possible.
+```
+MAINTAINER John Fink <john.fink@gmail.com>
+```
+```
+RUN echo "deb http://archive.ubuntu.com/ubuntu precise universe" >> /etc/apt/sources.list
+```
+```
+RUN DEBIAN_FRONTEND=noninteractive apt-get update
+```
+```
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python git pandoc
+```
+```
+ADD ./start.sh /start.sh
+```
+```
+RUN mkdir /article/
+```
+```
+ADD ./c4l-docker-article.md /article/c4l-docker-article.md
+```
+```
+EXPOSE 8888
+```
+```
+CMD ["/bin/bash", "/start.sh"]
+```
+<!--- I like the idea you mentioned last week of including a simple step-by-step example. I'm guessing it would go somewhere in here and replace these paragraphs because it would illustrate the same concepts. -->
+
 
 A Real-World Example
 --------------------
@@ -119,10 +128,6 @@ This ensures that different values for important variables get loaded each time 
 Docker-wordpress has a great advantage in that it's one image, can be run in one container, and is easy to understand. But it would be a mistake to consider it a good model for a production-type instance. In particular, its slapdash approach to logging (something Logstash[^logstash] could go a long way towards fixing) and inclusion of a local MySQL instance make it a difficult sell for a production environment as it is currently written.  Consider running 20 docker-wordpresses, each with its own database; it would make much more sense to have a single MySQL server serving multiple Wordpress instances.
 
 
-Article-as-Container
---------------------
-
-This article has its own Github[^githubarticle] repository and included in that repository is the text of the article and a very simple Docker container that converts the Markdown the article is written in to html via pandoc[^pandoc] and serves it up via the Python SimpleHTTPServer module.
 
 
 Conclusion
