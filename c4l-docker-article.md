@@ -60,7 +60,7 @@ f752161937c6        ldap_update_pw:latest     supervisord -n      5 weeks ago   
 33cf9eb89073        catmandu:in-process       /bin/bash           6 weeks ago         Up 13 days                                                       cranky_mccarthy     
 ```
 
-Individual docker instances are split up into *images* and *containers*. Containers run instances of images. You can have several containers that come from the same image or variants of that image. In the above list, we can see that container id b58946da298c and e5a0f8a71f7e are running versions of the image "papyrus-demo," demonstrating that images can have tags that act similarly to git tags, representing different states of a common image. In the papyrus-demo's image, there's a tag "in-process" And a tag "port6000"; an image without a distinct tag is always "latest".
+Individual docker instances are split up into *images* and *containers*. Containers run instances of images. You can have several containers that come from the same image or variants of that image. In the above list, we can see that container id b58946da298c and e5a0f8a71f7e are running versions of the image "papyrus-demo," demonstrating that images can have tags that act similarly to git tags, representing different states of a common image. In the papyrus-demo's image, there's a tag "in-process" and a tag "port6000"; an image without a distinct tag is always "latest".
 
 
 Article-as-Container
@@ -72,34 +72,84 @@ This article has its own Github[^githubarticle] repository and included in that 
 FROM ubuntu:latest
 ```
 
+This is the image to use as a base. In this case, it's building from Docker's stock Ubuntu image.
+
 ```
 MAINTAINER John Fink <john.fink@gmail.com>
 ```
+
+The maintainer of the created image.
+
 ```
 RUN echo "deb http://archive.ubuntu.com/ubuntu precise universe" >> /etc/apt/sources.list
 ```
+
+The ```RUN``` statement runs a command from within the image being built. In this case, it's adding the Universe repository to Ubuntu's source list, so later on we can install pandoc.
+
 ```
 RUN DEBIAN_FRONTEND=noninteractive apt-get update
 ```
+
 ```
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python git pandoc
 ```
+
+Two ```RUN``` statements, updating Ubuntu and installing the necessary packages.
+
 ```
 ADD ./start.sh /start.sh
 ```
+
+```ADD``` inserts files from outside the building image. Here, start.sh is added to the image.
+
 ```
 RUN mkdir /article/
 ```
+
 ```
 ADD ./c4l-docker-article.md /article/c4l-docker-article.md
 ```
+
+A ```RUN``` and an ```ADD``` together, making the directory and adding the article Markdown to it.
+
 ```
 EXPOSE 8888
 ```
+
+```EXPOSE``` tells Docker that containers built from the image will have programs running that need access to port 8888; in this case, for Python's SimpleHTTPServer.
+
+
 ```
 CMD ["/bin/bash", "/start.sh"]
 ```
+
+The ```CMD``` statement defines a default program to run inside the container if no specific command is given; here, we want containers to run the start.sh file using /bin/bash.
+
+
+The extremely basic start.sh files looks like this:
+
+```
+cd /article/
+pandoc c4l-docker-article.md -o index.html
+python -m SimpleHTTPServer 8888
+```
+
+All it does is go to the article's directory, convert the article from Markdown to html, and then spawn Python's SimpleHTTPServer to serve the article. We can build this image right from Github with the following command:
+
+```
+docker build -t c4l-docker-wordpress git://github.com/jbfink/c4l-docker-article
+```
+
+And after the build, run it with:
+
+```
+docker run -Pd c4l-docker-article
+```
+
+The flag P tells Docker to expose a random port on the host to the container port 8888, and flag d tells Docker to run the container detached in the background. 
+
 <!--- I like the idea you mentioned last week of including a simple step-by-step example. I'm guessing it would go somewhere in here and replace these paragraphs because it would illustrate the same concepts. -->
+
 
 
 A Real-World Example
