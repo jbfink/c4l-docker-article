@@ -149,8 +149,6 @@ docker run -Pd c4l-docker-article
 The flag P tells Docker to expose a random port on the host to the container port 8888, and flag d tells Docker to run the container detached in the background.  Running ```docker ps``` should show a line with the new container and the random port assigned to it; going to the Docker host with any web browser and that port renders the article.
 
 
-<!--- I like the idea you mentioned last week of including a simple step-by-step example. I'm guessing it would go somewhere in here and replace these paragraphs because it would illustrate the same concepts. -->
-
 
 
 A Real-World Example
