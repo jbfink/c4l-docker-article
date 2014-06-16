@@ -182,9 +182,9 @@ Docker-wordpress has a great advantage in that it's one image, can be run in one
 Conclusion
 ==========
 
-As the Docker developers state upfront, the software has not yet reached version 1.0 and is still under heavy development. <!--- Probably need a citation here linking to that statement. --> As a result, some features are still unstable. For example, Docker has had a historical disadvantage in depending on a kernel feature (AUFS) that, notably, is not part of the standard Linux kernel, making implementations on non-Ubuntu systems somewhat problematic. This was solved in more recent versions[^docker07] by introducing a storage layer API. However, Docker will probably reach a steady 1.0 with a corresponding stable API by the end of 2014; until then, it's probably best relegated to non-critical roles.
+Docker has been under heavy development for over a year and while during that time its creators have more or less discouraged people from attempting to run Docker as a production-ready framework. However, on June 9th, Docker reached 1.0[^docker10] status, and as such should be considered ready for production instances. 
 
-Furthermore, porting more esoteric applications to Docker is not yet an easy procedure. Docker wants to run things in foreground processes, making it necessary to convert common programs like MySQL and Apache from their usual background modes to foreground ones, and Docker's focus on one application per container (achieved in docker-wordpress and many other Docker applications through judicious use of supervisord) makes, say, running an ILS like Evergreen somewhat problematic. <!--- Expound on this. -->
+However, porting more esoteric applications to Docker is not yet an easy procedure. Docker wants to run things in foreground processes, making it necessary to convert common programs like MySQL and Apache from their usual background modes to foreground ones, and Docker's focus on one application per container (achieved in docker-wordpress and many other Docker applications through judicious use of supervisord) makes running products with complicated install procedures somewhat less than optimal and perhaps more suited to traditional VM or bare iron deployments for now.
 
 Despite the work yet to be done on Docker, it is rapidly approaching a stable state[^docker10] and shows definite promise for incorporating into libraries' virtualization activities. For software development, when programmers check their code into git, a Dockerfile could be included in the source code, allowing for quick testing of code on remote servers or as a demonstration tool to let others quickly bring up their own versions of an application without having to worry about specific building instructions or dependency management. Docker could be used as a backup strategy -- as part of a backup script for a library's web site, a Docker image could be built for a rapid deployment in case of service outage. And for regular systems administration tasks, who wouldn't be happy to see a huge installation procedure[^evergreenbuh] boiled down to a single command?
 
@@ -256,8 +256,6 @@ Despite the work yet to be done on Docker, it is rapidly approaching a stable st
 
 [^pandoc]: http://johnmacfarlane.net/pandoc/
 
-[^docker07]: http://blog.docker.io/2013/11/docker-0-7-docker-now-runs-on-any-linux-distribution/
-
-[^docker10]: http://blog.docker.io/2013/08/getting-to-docker-1-0/
+[^docker10]: http://blog.docker.com/2014/06/its-here-docker-1-0/
 
 [^evergreenbuh]: http://docs.evergreen-ils.org/2.5/_installing_the_evergreen_server.html
