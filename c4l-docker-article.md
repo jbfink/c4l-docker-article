@@ -182,7 +182,7 @@ Docker-wordpress has a great advantage in that it's one image, can be run in one
 Conclusion
 ==========
 
-Docker has been under heavy development for over a year and while during that time its creators have more or less discouraged people from attempting to run Docker as a production-ready framework. However, on June 9th, Docker reached 1.0[^docker10] status, and as such should be considered ready for production instances. 
+Docker has been under heavy development for over a year and while during that time its creators have more or less discouraged people from attempting to run Docker as a production-ready framework. However, on June 9th, Docker reached 1.0[^docker10] status, and as such should be considered ready for production instances. Importantly, Docker 1.0 is compatible with all prior versions of Docker, so projects that started when Docker was a moving target can still be used going forward.
 
 However, porting more esoteric applications to Docker is not yet an easy procedure. Docker wants to run things in foreground processes, making it necessary to convert common programs like MySQL and Apache from their usual background modes to foreground ones, and Docker's focus on one application per container (achieved in docker-wordpress and many other Docker applications through judicious use of supervisord) makes running products with complicated install procedures somewhat less than optimal and perhaps more suited to traditional VM or bare iron deployments for now.
 
