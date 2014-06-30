@@ -65,11 +65,16 @@ Individual docker instances are split up into *images* and *containers*. Contain
 
 
 A Simple Example: Article-as-Container
---------------------------------------
+======================================
 
 To demonstrate how Docker works, I've created a simple container that converts the Markdown that this article is written in into HTML via pandoc[^pandoc] and serves it using the Python SimpleHTTPServer module. You can get the Docker container from the Github repository[^githubarticle] for this article. 
 
-<!-- edit/remove this> This article has its own Github[^githubarticle] repository and included in that repository is the text of the article and a very simple Docker container that converts the Markdown the article is written in to html via pandoc[^pandoc] and serves it up via the Python SimpleHTTPServer module. As such, it is a very simple Docker container and is built with two components. The first of which, the Dockerfile, runs when the image is first built and the second, start.sh, runs at each instantiation of image into container. Here's the Dockerfile, line by line:
+It's a very simple Docker container and is built with two components. The first of which, the Dockerfile, runs when the image is first built and the second, start.sh, runs at each instantiation of image into container. The article text is in c4l-docker-article.md and it's this file that gets converted by pandoc and served with SimpleHTTPServer in start.sh. 
+
+Let's break down the components and how to run them.
+
+Dockerfile
+----------
 
 ```
 FROM ubuntu:latest
@@ -129,6 +134,9 @@ CMD ["/bin/bash", "/start.sh"]
 The ```CMD``` statement defines a default program to run inside the container if no specific command is given; here, we want containers to run the start.sh file using /bin/bash.
 
 
+start.sh
+--------
+
 The extremely basic start.sh files looks like this:
 
 ```
@@ -137,7 +145,11 @@ pandoc c4l-docker-article.md -o index.html
 python -m SimpleHTTPServer 8888
 ```
 
-All it does is go to the article's directory, convert the article from Markdown to html, and then spawn Python's SimpleHTTPServer to serve the article. We can build this image right from Github with the following command:
+All it does is go to the article's directory, convert the article from Markdown to html, and then spawn Python's SimpleHTTPServer to serve the article. 
+
+
+Building the article container
+------------------------------
 
 ```
 docker build -t c4l-docker-wordpress git://github.com/jbfink/c4l-docker-article
@@ -155,7 +167,7 @@ The flag P tells Docker to expose a random port on the host to the container por
 
 
 A Real-World Example: WordPress
---------------------
+===============================
 
 In the spring of 2013 I started building a Docker WordPress container with an eye towards using it in-house for development projects. Why WordPress? WordPress is the white lab rat of library software -- it's used everywhere, is well supported, is well understood, is generally easy to take care of, and has a huge host of ancillary software behind it. It's a good real-world example for testing Docker's capabilities. Initially I built the container manually -- that is, by launching a single Docker container running a bash shell and basically performing the steps in the above Dockerfile by hand (doing the normal apt-gets and vim editing of config files). I put it up on docker index[^dockerindex] and was contacted by a few folks in email about how I built it. In August of 2013 I started work on docker-wordpress[^dwgithub], a structured way of building what I had done manually that people could play with and build on.
 
