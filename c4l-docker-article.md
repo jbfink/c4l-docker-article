@@ -63,8 +63,8 @@ f752161937c6        ldap_update_pw:latest     supervisord -n      5 weeks ago   
 Individual docker instances are split up into *images* and *containers*. Containers run instances of images. You can have several containers that come from the same image or variants of that image. In the above list, we can see that container id b58946da298c and e5a0f8a71f7e are running versions of the image "papyrus-demo," demonstrating that images can have tags that act similarly to git tags, representing different states of a common image. In the papyrus-demo's image, there's a tag "in-process" and a tag "port6000"; an image without a distinct tag is always "latest".
 
 
-Article-as-Container
---------------------
+A Simple Example: Article-as-Container
+--------------------------------------
 
 This article has its own Github[^githubarticle] repository and included in that repository is the text of the article and a very simple Docker container that converts the Markdown the article is written in to html via pandoc[^pandoc] and serves it up via the Python SimpleHTTPServer module. As such, it is a very simple Docker container and is built with two components. The first of which, the Dockerfile, runs when the image is first built and the second, start.sh, runs at each instantiation of image into container. Here's the Dockerfile, line by line:
 
@@ -151,7 +151,7 @@ The flag P tells Docker to expose a random port on the host to the container por
 
 
 
-A Real-World Example
+A Real-World Example: Wordpress
 --------------------
 
 In the spring of 2013 I started building a Docker Wordpress container with an eye towards using it in-house for development projects. Why Wordpress? Wordpress is the white lab rat of library software -- it's used everywhere, is well supported, is well understood, is generally easy to take care of, and has a huge host of ancillary software behind it. It's a good real-world example for testing Docker's capabilities. Initially I built the container manually -- that is, by launching a single Docker container running a bash shell and basically performing the steps in the above Dockerfile by hand (doing the normal apt-gets and vim editing of config files). I put it up on docker index[^dockerindex] and was contacted by a few folks in email about how I built it. In August of 2013 I started work on docker-wordpress[^dwgithub], a structured way of building what I had done manually that people could play with and build on.
