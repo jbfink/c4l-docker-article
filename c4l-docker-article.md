@@ -163,7 +163,8 @@ And after the build, run it with:
 docker run -Pd c4l-docker-article
 ```
 
-The flag P tells Docker to expose a random port on the host to the container port 8888, and flag d tells Docker to run the container detached in the background.  Running ```docker ps``` should show a line with the new container and the random port assigned to it; going to the Docker host with any web browser and that port renders the article.
+
+Every time a new container is created from the c4l-docker-article image -- as we're doing when we do ```docker run``` -- the ```CMD``` statement from the Dockerfile is run; in this case, our ```start.sh``` file.  This file converts the article markdown to HTML and runs SimpleHTTPServer to serve the file. The flag P tells Docker to expose a random port on the host to the container port 8888 so SimpleHTTPServer can be reached from outside the container, and flag d tells Docker to run the container detached in the background.  Running ```docker ps``` should show a line with the new container and the random port assigned to it; going to the Docker host with any web browser and that port renders the article.
 
 
 
