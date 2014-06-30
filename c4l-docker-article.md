@@ -69,7 +69,7 @@ A Simple Example: Article-as-Container
 
 To demonstrate how Docker works, I've created a simple container that converts the Markdown that this article is written in into HTML via pandoc[^pandoc] and serves it using the Python SimpleHTTPServer module. You can get the Docker container from the Github repository[^githubarticle] for this article. 
 
-It's a very simple Docker container and is built with two components. The first of which, the Dockerfile, runs when the image is first built and the second, start.sh, runs at each instantiation of image into container. The article text is in c4l-docker-article.md and it's this file that gets converted by pandoc and served with SimpleHTTPServer in start.sh. 
+It's a very simple Docker container and is built with two components. The first of which, the ```Dockerfile```, runs when the image is first built and the second, start.sh, runs at each instantiation of image into container. The article text is in ```c4l-docker-article.md``` and it's this file that gets converted by pandoc and served with SimpleHTTPServer in ```start.sh```. 
 
 Let's break down the components and how to run them.
 
@@ -150,6 +150,8 @@ All it does is go to the article's directory, convert the article from Markdown 
 
 Building the article container
 ------------------------------
+
+Running the ```docker build``` command builds the container. The command parses each line of the Dockerfile, saving each step as a commit and layering the next commit on top. This makes it easy to rollback if errors are detected. As a performance bonus, subsequent invocations of ```docker build``` will use the prior layers as a cache, only building new layers when a line is changed. This usually makes building images from edits very fast.
 
 ```
 docker build -t c4l-docker-wordpress git://github.com/jbfink/c4l-docker-article
