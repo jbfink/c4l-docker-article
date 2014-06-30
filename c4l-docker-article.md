@@ -1,7 +1,8 @@
 
 Docker: a Software as a Service, operating-system level virtualization framework, by John Fink
+==============================================================================================
 
-----
+
 
 If you were working in library IT in the last millennium, you'll likely remember what your server room used to look like. PC towers running Novell Netware attached to huge multi-disc CDROM arrays. Refrigerator-sized Sun boxes. Digital AlphaServers running your library catalogue. To run most of the serious business of libraries, you needed serious equipment, and, as a result, machine rooms were often jumbled messes of shelves, wires and air conditioning units. With the advent of Linux running on microcomputers, these rooms became slightly smaller and maybe slightly less complex, but it wasn't until the early 2000s that the real sea change came for the server room -- the rapid adoption of easily implementable virtualization[^wikivirtualization], which allowed running multiple discrete operating systems on a single machine.
 
@@ -66,7 +67,9 @@ Individual docker instances are split up into *images* and *containers*. Contain
 A Simple Example: Article-as-Container
 --------------------------------------
 
-This article has its own Github[^githubarticle] repository and included in that repository is the text of the article and a very simple Docker container that converts the Markdown the article is written in to html via pandoc[^pandoc] and serves it up via the Python SimpleHTTPServer module. As such, it is a very simple Docker container and is built with two components. The first of which, the Dockerfile, runs when the image is first built and the second, start.sh, runs at each instantiation of image into container. Here's the Dockerfile, line by line:
+To demonstrate how Docker works, I've created a simple container that converts the Markdown that this article is written in into HTML via pandoc[^pandoc] and serves it using the Python SimpleHTTPServer module. You can get the Docker container from the Github repository[^githubarticle] for this article. 
+
+<!-- edit/remove this> This article has its own Github[^githubarticle] repository and included in that repository is the text of the article and a very simple Docker container that converts the Markdown the article is written in to html via pandoc[^pandoc] and serves it up via the Python SimpleHTTPServer module. As such, it is a very simple Docker container and is built with two components. The first of which, the Dockerfile, runs when the image is first built and the second, start.sh, runs at each instantiation of image into container. Here's the Dockerfile, line by line:
 
 ```
 FROM ubuntu:latest
