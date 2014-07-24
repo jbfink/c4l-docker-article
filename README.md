@@ -16,7 +16,7 @@ docker build -rm -t <yourname>/c4l-article-docker git://github.com/jbfink/c4l-do
 Run as:
 
 ```
-docker run -Pd <yourname>/c4l-docker-article
+docker run -Pd <yourname>/c4l-article-docker
 ```
 
 Then check docker ps for the exposed port and hit it with a web browser! There! Wasn't that much easier than just going directly to the article itself????
